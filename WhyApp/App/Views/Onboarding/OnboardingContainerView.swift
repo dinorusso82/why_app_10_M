@@ -12,7 +12,9 @@ struct OnboardingContainerView: View {
 
         case .addItems:
             OnboardingAddItemsView(onFinish: {
-                store.completeOnboarding()
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    store.completeOnboarding()
+                }
             })
         }
     }
@@ -24,67 +26,85 @@ struct OnboardingAddItemsView: View {
     var onFinish: () -> Void
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                if store.blockedItems.isEmpty {
-                    ContentUnavailableView(
-                        "No items yet",
-                        systemImage: "plus.circle",
-                        description: Text("Tap the button below to add an app or website you want to avoid.")
-                    )
-                } else {
-                    List {
+        VStack(spacing: 0) {
+            // Header
+            VStack(spacing: 8) {
+                Text("Your List")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.whyPrimary)
+                Text("What do you want to stay away from?")
+                    .font(.system(.subheadline, design: .rounded))
+                    .foregroundStyle(Color.whySecondary)
+            }
+            .padding(.top, 60)
+            .padding(.bottom, 24)
+
+            if store.blockedItems.isEmpty {
+                Spacer()
+                VStack(spacing: 16) {
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 48))
+                        .foregroundStyle(Color.whyTertiary)
+                    Text("Add an app or website\nyou want to avoid.")
+                        .font(.system(.body, design: .rounded))
+                        .foregroundStyle(Color.whySecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                }
+                Spacer()
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
                         ForEach(store.blockedItems) { item in
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Image(systemName: item.isApp ? "app.fill" : "globe")
-                                        .foregroundStyle(.secondary)
-                                    Text(item.name)
-                                        .font(.headline)
+                            WhyCard {
+                                HStack(spacing: 14) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.whySurface)
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: item.isApp ? "app.fill" : "globe")
+                                            .font(.system(size: 18))
+                                            .foregroundStyle(Color.whyWarm)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(item.name)
+                                            .font(.system(.body, design: .rounded, weight: .semibold))
+                                            .foregroundStyle(Color.whyPrimary)
+                                        Text(item.whyNot)
+                                            .font(.system(.caption, design: .rounded))
+                                            .foregroundStyle(Color.whySecondary)
+                                            .lineLimit(2)
+                                            .lineSpacing(2)
+                                    }
+
+                                    Spacer()
                                 }
-                                Text(item.whyNot)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(2)
                             }
-                            .padding(.vertical, 4)
                         }
                     }
+                    .padding(.horizontal, 24)
+                }
+            }
+
+            // Buttons
+            VStack(spacing: 12) {
+                WhyButton(title: "Add Item", style: .ghost) {
+                    showingAddSheet = true
                 }
 
-                VStack(spacing: 12) {
-                    Button {
-                        showingAddSheet = true
-                    } label: {
-                        Label("Add Item", systemImage: "plus.circle.fill")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(.blue)
-                            .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
-                    }
-
-                    if !store.blockedItems.isEmpty {
-                        Button {
-                            onFinish()
-                        } label: {
-                            Text("Done — I'm Ready")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(.green)
-                                .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
-                        }
+                if !store.blockedItems.isEmpty {
+                    WhyButton(title: "I'm Ready", style: .primary) {
+                        onFinish()
                     }
                 }
-                .padding(24)
             }
-            .navigationTitle("Your List")
-            .sheet(isPresented: $showingAddSheet) {
-                AddBlockedItemView()
-            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40)
+        }
+        .whyBackground()
+        .sheet(isPresented: $showingAddSheet) {
+            AddBlockedItemView()
         }
     }
 }

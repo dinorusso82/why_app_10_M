@@ -18,56 +18,131 @@ struct AddBlockedItemView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Button {
-                        showingPicker = true
-                    } label: {
-                        HStack {
-                            Text(hasSelection ? "App/website selected" : "Tap to choose an app or website")
-                                .foregroundStyle(hasSelection ? .primary : .secondary)
-                            Spacer()
-                            Image(systemName: hasSelection ? "checkmark.circle.fill" : "chevron.right")
-                                .foregroundStyle(hasSelection ? .green : .secondary)
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Step 1 — Pick app/website
+                    WhyCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label {
+                                Text("Select App or Website")
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Color.whyPrimary)
+                            } icon: {
+                                stepBadge(1)
+                            }
+
+                            Button {
+                                showingPicker = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: hasSelection ? "checkmark.circle.fill" : "app.badge.fill")
+                                        .foregroundStyle(hasSelection ? Color.whySage : Color.whyTertiary)
+                                        .font(.title3)
+
+                                    Text(hasSelection ? "Selected" : "Tap to choose…")
+                                        .font(.system(.body, design: .rounded))
+                                        .foregroundStyle(hasSelection ? Color.whyPrimary : Color.whySecondary)
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.whyTertiary)
+                                }
+                                .padding(14)
+                                .background(Color.whyCream)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                            .familyActivityPicker(isPresented: $showingPicker, selection: $selection)
                         }
                     }
-                    .familyActivityPicker(isPresented: $showingPicker, selection: $selection)
-                } header: {
-                    Text("What do you want to avoid?")
-                }
 
-                Section {
-                    TextField("e.g. YouTube, Twitter, Gambling Site", text: $name)
-                } header: {
-                    Text("Give it a name")
-                } footer: {
-                    Text("This name will appear on the block screen.")
-                }
+                    // Step 2 — Name it
+                    WhyCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label {
+                                Text("Give It a Name")
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Color.whyPrimary)
+                            } icon: {
+                                stepBadge(2)
+                            }
 
-                Section {
-                    TextEditor(text: $whyNot)
-                        .frame(minHeight: 120)
-                } header: {
-                    Text("Why do you want to avoid it?")
-                } footer: {
-                    Text("Be honest with yourself. This is the reminder you'll see when you're tempted.")
+                            TextField("e.g. YouTube, Twitter, Betting App", text: $name)
+                                .font(.system(.body, design: .rounded))
+                                .padding(14)
+                                .background(Color.whyCream)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                            Text("This name shows on the block screen.")
+                                .font(.system(.caption, design: .rounded))
+                                .foregroundStyle(Color.whyTertiary)
+                        }
+                    }
+
+                    // Step 3 — Why not
+                    WhyCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label {
+                                Text("Why Do You Want to Avoid It?")
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Color.whyPrimary)
+                            } icon: {
+                                stepBadge(3)
+                            }
+
+                            ZStack(alignment: .topLeading) {
+                                if whyNot.isEmpty {
+                                    Text("Be honest with yourself. This is the reminder you'll see when you're tempted…")
+                                        .font(.system(.body, design: .rounded))
+                                        .foregroundStyle(Color.whyTertiary)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 16)
+                                }
+                                TextEditor(text: $whyNot)
+                                    .font(.system(.body, design: .rounded))
+                                    .scrollContentBackground(.hidden)
+                                    .padding(10)
+                                    .frame(minHeight: 100)
+                            }
+                            .background(Color.whyCream)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        }
+                    }
                 }
+                .padding(24)
             }
+            .whyBackground()
             .navigationTitle("Block Something")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .font(.system(.body, design: .rounded))
+                        .foregroundStyle(Color.whySecondary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         saveItems()
                         dismiss()
                     }
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+                    .foregroundStyle(canSave ? Color.whyWarm : Color.whyTertiary)
                     .disabled(!canSave)
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func stepBadge(_ n: Int) -> some View {
+        Text("\(n)")
+            .font(.system(.caption2, design: .rounded, weight: .bold))
+            .foregroundStyle(.white)
+            .frame(width: 22, height: 22)
+            .background(Color.whyWarm)
+            .clipShape(Circle())
     }
 
     private var canSave: Bool {
@@ -80,27 +155,22 @@ struct AddBlockedItemView: View {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         let trimmedWhy = whyNot.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Create a BlockedItem for each selected app token
         for token in selection.applicationTokens {
-            let item = BlockedItem(
+            store.addBlockedItem(BlockedItem(
                 name: trimmedName,
                 applicationToken: token,
                 whyNot: trimmedWhy
-            )
-            store.addBlockedItem(item)
+            ))
         }
 
-        // Create a BlockedItem for each selected web domain token
         for token in selection.webDomainTokens {
-            let item = BlockedItem(
+            store.addBlockedItem(BlockedItem(
                 name: trimmedName,
                 webDomainToken: token,
                 whyNot: trimmedWhy
-            )
-            store.addBlockedItem(item)
+            ))
         }
 
-        // Apply shields immediately
         screenTime.applyShields()
     }
 }

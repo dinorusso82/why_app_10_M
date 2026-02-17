@@ -5,41 +5,54 @@ struct ContentView: View {
     @EnvironmentObject var screenTime: ScreenTimeManager
 
     @State private var currentPending: PendingReason?
+    @State private var selectedTab = 0
 
     var body: some View {
         Group {
             if !store.hasCompletedOnboarding {
                 OnboardingContainerView()
+                    .transition(.opacity)
             } else if let pending = currentPending {
-                // Force the user to explain any pending reasons before using the app
                 PendingReasonView(pendingReason: pending) {
                     loadNextPending()
                 }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
-                TabView {
-                    HomeView()
-                        .tabItem {
-                            Label("My List", systemImage: "shield.fill")
-                        }
-
-                    LogView()
-                        .tabItem {
-                            Label("Log", systemImage: "book.fill")
-                        }
-                }
+                mainTabs
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: 0.4), value: store.hasCompletedOnboarding)
+        .animation(.easeInOut(duration: 0.3), value: currentPending?.id)
         .onAppear {
-            // Re-shield any items whose temporary access has expired
             screenTime.reshieldExpiredItems()
-            // Reload store data (extensions may have written new pending reasons)
             reloadData()
             loadNextPending()
+            styleTabBar()
         }
     }
 
+    @ViewBuilder
+    private var mainTabs: some View {
+        TabView(selection: $selectedTab) {
+            HomeView()
+                .tag(0)
+                .tabItem {
+                    Image(systemName: "shield.fill")
+                    Text("My List")
+                }
+
+            LogView()
+                .tag(1)
+                .tabItem {
+                    Image(systemName: "book.fill")
+                    Text("Log")
+                }
+        }
+        .tint(Color.whyWarm)
+    }
+
     private func reloadData() {
-        // Re-initialize from shared storage to pick up changes made by extensions
         let fresh = SharedDataStore()
         store.blockedItems = fresh.blockedItems
         store.accessAttempts = fresh.accessAttempts
@@ -48,5 +61,14 @@ struct ContentView: View {
 
     private func loadNextPending() {
         currentPending = store.pendingReasons.first
+    }
+
+    private func styleTabBar() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(Color.whyCream)
+        appearance.shadowColor = UIColor(Color.whyDivider)
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 }

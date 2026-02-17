@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Shown when the user opens WhyApp and has outstanding pending reasons
-/// (they bypassed a shield but haven't explained why yet).
 struct PendingReasonView: View {
     @EnvironmentObject var store: SharedDataStore
     @EnvironmentObject var screenTime: ScreenTimeManager
@@ -10,71 +8,103 @@ struct PendingReasonView: View {
     var onComplete: () -> Void
 
     @State private var whyYes = ""
+    @State private var animate = false
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                Spacer()
+        VStack(spacing: 0) {
+            Spacer()
+
+            // Top illustration
+            ZStack {
+                Circle()
+                    .fill(Color.whyAmber.opacity(0.15))
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(animate ? 1.0 : 0.8)
 
                 Image(systemName: "questionmark.circle.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.orange)
-
-                Text("You used \(pendingReason.blockedItemName)")
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                VStack(spacing: 8) {
-                    Text("You said you didn't want to because:")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    Text(""\(pendingReason.whyNot)"")
-                        .font(.body)
-                        .italic()
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-
-                Text("Why did you decide to use it?")
-                    .font(.headline)
-
-                TextEditor(text: $whyYes)
-                    .frame(minHeight: 100, maxHeight: 150)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
-                    )
-                    .padding(.horizontal)
-
-                Spacer()
-
-                Button {
-                    store.resolvePendingReason(
-                        pendingReason,
-                        whyYes: whyYes.trimmingCharacters(in: .whitespacesAndNewlines),
-                        proceeded: true
-                    )
-                    // Re-apply shield now that they've provided a reason
-                    screenTime.applyShields()
-                    onComplete()
-                } label: {
-                    Text("Submit & Re-enable Shield")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                }
-                .disabled(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .padding(.horizontal)
-
-                Spacer().frame(height: 20)
+                    .font(.system(size: 52))
+                    .foregroundStyle(Color.whyWarm)
+                    .scaleEffect(animate ? 1.0 : 0.6)
             }
-            .navigationTitle("Tell Us Why")
-            .navigationBarTitleDisplayMode(.inline)
-            .interactiveDismissDisabled()
+            .animation(.spring(response: 0.8, dampingFraction: 0.6), value: animate)
+
+            Spacer().frame(height: 28)
+
+            // Context
+            VStack(spacing: 16) {
+                Text("You used \(pendingReason.blockedItemName)")
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .foregroundStyle(Color.whyPrimary)
+
+                WhyCard {
+                    VStack(spacing: 8) {
+                        Text("You said you wanted to avoid it because:")
+                            .font(.system(.caption, design: .rounded, weight: .medium))
+                            .foregroundStyle(Color.whySecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Text("\"\(pendingReason.whyNot)\"")
+                            .font(.system(.body, design: .rounded))
+                            .italic()
+                            .foregroundStyle(Color.whyPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineSpacing(4)
+                    }
+                }
+                .padding(.horizontal, 24)
+            }
+
+            Spacer().frame(height: 28)
+
+            // Input
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Why did you decide to use it?")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(Color.whyPrimary)
+                    .padding(.horizontal, 24)
+
+                ZStack(alignment: .topLeading) {
+                    if whyYes.isEmpty {
+                        Text("Be honest — no one sees this but you…")
+                            .font(.system(.body, design: .rounded))
+                            .foregroundStyle(Color.whyTertiary)
+                            .padding(.horizontal, 38)
+                            .padding(.vertical, 20)
+                    }
+                    TextEditor(text: $whyYes)
+                        .font(.system(.body, design: .rounded))
+                        .scrollContentBackground(.hidden)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .frame(minHeight: 100, maxHeight: 140)
+                }
+                .background(Color.whyCardBg)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .shadow(color: .black.opacity(0.04), radius: 12, x: 0, y: 4)
+                .padding(.horizontal, 24)
+            }
+
+            Spacer()
+
+            // Submit button
+            WhyButton(title: "Submit & Re-enable Shield", style: .primary) {
+                store.resolvePendingReason(
+                    pendingReason,
+                    whyYes: whyYes.trimmingCharacters(in: .whitespacesAndNewlines),
+                    proceeded: true
+                )
+                screenTime.applyShields()
+                onComplete()
+            }
+            .disabled(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .opacity(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0)
+            .padding(.horizontal, 24)
+            .animation(.easeOut(duration: 0.2), value: whyYes.isEmpty)
+
+            Spacer().frame(height: 40)
         }
+        .whyBackground()
+        .interactiveDismissDisabled()
+        .onAppear { animate = true }
     }
 }

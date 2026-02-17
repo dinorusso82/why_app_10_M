@@ -6,41 +6,85 @@ struct HomeView: View {
     @State private var showingAddSheet = false
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if store.blockedItems.isEmpty {
-                    ContentUnavailableView(
-                        "Nothing blocked yet",
-                        systemImage: "shield",
-                        description: Text("Add apps or websites you want to stay away from.")
-                    )
-                } else {
-                    List {
-                        ForEach(store.blockedItems) { item in
-                            BlockedItemRow(item: item)
-                        }
-                        .onDelete { indexSet in
-                            for index in indexSet {
-                                store.removeBlockedItem(store.blockedItems[index])
-                            }
-                            screenTime.applyShields()
-                        }
-                    }
+        VStack(spacing: 0) {
+            // Custom header
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Why Not?")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.whyPrimary)
+                    Text("\(store.blockedItems.count) item\(store.blockedItems.count == 1 ? "" : "s") blocked")
+                        .font(.system(.subheadline, design: .rounded))
+                        .foregroundStyle(Color.whySecondary)
+                }
+
+                Spacer()
+
+                Button {
+                    showingAddSheet = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.whyWarm)
+                        .frame(width: 40, height: 40)
+                        .background(Color.whyWarm.opacity(0.12))
+                        .clipShape(Circle())
                 }
             }
-            .navigationTitle("Why Not?")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+
+            if store.blockedItems.isEmpty {
+                Spacer()
+                VStack(spacing: 20) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.whySurface)
+                            .frame(width: 100, height: 100)
+                        Image(systemName: "shield")
+                            .font(.system(size: 40))
+                            .foregroundStyle(Color.whyTertiary)
+                    }
+                    Text("Nothing blocked yet")
+                        .font(.system(.title3, design: .rounded, weight: .semibold))
+                        .foregroundStyle(Color.whyPrimary)
+                    Text("Add apps or websites you\nwant to stay away from.")
+                        .font(.system(.body, design: .rounded))
+                        .foregroundStyle(Color.whySecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+
+                    WhyButton(title: "Add Your First Item") {
                         showingAddSheet = true
-                    } label: {
-                        Image(systemName: "plus")
                     }
+                    .padding(.horizontal, 48)
+                    .padding(.top, 8)
+                }
+                Spacer()
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(store.blockedItems) { item in
+                            BlockedItemRow(
+                                item: item,
+                                onDelete: {
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        store.removeBlockedItem(item)
+                                        screenTime.applyShields()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 100)
                 }
             }
-            .sheet(isPresented: $showingAddSheet) {
-                AddBlockedItemView()
-            }
+        }
+        .whyBackground()
+        .sheet(isPresented: $showingAddSheet) {
+            AddBlockedItemView()
         }
     }
 }
