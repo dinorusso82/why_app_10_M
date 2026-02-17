@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LogView: View {
-    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var store: SharedDataStore
 
     var body: some View {
         NavigationStack {
@@ -10,7 +10,7 @@ struct LogView: View {
                     ContentUnavailableView(
                         "No entries yet",
                         systemImage: "book.closed",
-                        description: Text("Your access attempts will appear here.")
+                        description: Text("When you try to open a blocked app, it'll be logged here.")
                     )
                 } else {
                     List {

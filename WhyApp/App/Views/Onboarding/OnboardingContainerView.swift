@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct OnboardingContainerView: View {
-    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var store: SharedDataStore
+    @EnvironmentObject var screenTime: ScreenTimeManager
     @State private var currentStep: OnboardingStep = .welcome
 
     var body: some View {
@@ -18,7 +19,7 @@ struct OnboardingContainerView: View {
 }
 
 struct OnboardingAddItemsView: View {
-    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var store: SharedDataStore
     @State private var showingAddSheet = false
     var onFinish: () -> Void
 
@@ -36,7 +37,7 @@ struct OnboardingAddItemsView: View {
                         ForEach(store.blockedItems) { item in
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Image(systemName: item.category == .website ? "globe" : "app.fill")
+                                    Image(systemName: item.isApp ? "app.fill" : "globe")
                                         .foregroundStyle(.secondary)
                                     Text(item.name)
                                         .font(.headline)
@@ -82,7 +83,7 @@ struct OnboardingAddItemsView: View {
             }
             .navigationTitle("Your List")
             .sheet(isPresented: $showingAddSheet) {
-                AddBlockedItemView(isFromOnboarding: false)
+                AddBlockedItemView()
             }
         }
     }

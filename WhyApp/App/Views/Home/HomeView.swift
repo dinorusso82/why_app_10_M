@@ -1,10 +1,9 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var store: SharedDataStore
+    @EnvironmentObject var screenTime: ScreenTimeManager
     @State private var showingAddSheet = false
-    @State private var selectedItem: BlockedItem?
-    @State private var showingIntervention = false
 
     var body: some View {
         NavigationStack {
@@ -18,15 +17,13 @@ struct HomeView: View {
                 } else {
                     List {
                         ForEach(store.blockedItems) { item in
-                            BlockedItemRow(item: item) {
-                                selectedItem = item
-                                showingIntervention = true
-                            }
+                            BlockedItemRow(item: item)
                         }
                         .onDelete { indexSet in
                             for index in indexSet {
                                 store.removeBlockedItem(store.blockedItems[index])
                             }
+                            screenTime.applyShields()
                         }
                     }
                 }
@@ -43,11 +40,6 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingAddSheet) {
                 AddBlockedItemView()
-            }
-            .sheet(isPresented: $showingIntervention) {
-                if let item = selectedItem {
-                    InterventionView(item: item)
-                }
             }
         }
     }

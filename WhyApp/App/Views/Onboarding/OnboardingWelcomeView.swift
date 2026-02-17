@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct OnboardingWelcomeView: View {
+    @EnvironmentObject var screenTime: ScreenTimeManager
     @Binding var currentStep: OnboardingStep
 
     var body: some View {
@@ -24,14 +25,19 @@ struct OnboardingWelcomeView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Text("Start by adding the apps or websites you want to avoid, and your reason why.")
+                Text("We'll need Screen Time permission to show you a reminder when you try to open blocked apps.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
 
                 Button {
-                    currentStep = .addItems
+                    Task {
+                        await screenTime.requestAuthorization()
+                        if screenTime.isAuthorized {
+                            currentStep = .addItems
+                        }
+                    }
                 } label: {
                     Text("Get Started")
                         .font(.headline)
@@ -42,10 +48,16 @@ struct OnboardingWelcomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .padding(.horizontal, 24)
+
+                if let error = screenTime.authorizationError {
+                    Text("Permission denied: \(error)")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .padding(.horizontal, 32)
+                }
             }
 
-            Spacer()
-                .frame(height: 40)
+            Spacer().frame(height: 40)
         }
     }
 }

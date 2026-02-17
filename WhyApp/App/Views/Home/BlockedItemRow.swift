@@ -2,29 +2,27 @@ import SwiftUI
 
 struct BlockedItemRow: View {
     let item: BlockedItem
-    var onAccessAttempt: () -> Void
 
-    @EnvironmentObject var store: DataStore
+    @EnvironmentObject var store: SharedDataStore
 
     private var attemptCount: Int {
-        store.attemptsFor(item: item).count
+        store.accessAttempts.filter { $0.blockedItemId == item.id }.count
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: item.category == .website ? "globe" : "app.fill")
+                Image(systemName: item.isApp ? "app.fill" : "globe")
                     .foregroundStyle(.blue)
                     .frame(width: 28)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.name)
                         .font(.headline)
-
                     Text(item.whyNot)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .lineLimit(2)
                 }
 
                 Spacer()
@@ -40,15 +38,6 @@ struct BlockedItemRow: View {
                         .clipShape(Capsule())
                 }
             }
-
-            Button {
-                onAccessAttempt()
-            } label: {
-                Text("I want to use this…")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
-            }
-            .buttonStyle(.plain)
         }
         .padding(.vertical, 4)
     }

@@ -1,0 +1,107 @@
+import ManagedSettings
+import ManagedSettingsUI
+
+/// Handles button taps on the shield overlay.
+///
+/// - Primary ("You're right — close it"): Dismisses the blocked app. Logged as "walked away".
+/// - Secondary ("I need to use it…"): Temporarily removes the shield and creates a
+///   pending reason the user must fill in next time they open WhyApp.
+class WhyNotShieldAction: ShieldActionExtension {
+
+    private let store = SharedDataStore()
+    private let settingsStore = ManagedSettingsStore()
+
+    // MARK: - App Actions
+
+    override func handle(
+        action: ShieldAction,
+        for application: Application,
+        completionHandler: @escaping (ShieldActionResponse) -> Void
+    ) {
+        switch action {
+        case .primaryButtonPressed:
+            // "You're right — close it"
+            logWalkedAway(appToken: application.token)
+            completionHandler(.close)
+
+        case .secondaryButtonPressed:
+            // "I need to use it…" — lift shield, record pending reason
+            if let token = application.token {
+                settingsStore.shield.applications?.remove(token)
+                createPendingReason(appToken: token)
+            }
+            completionHandler(.close)
+
+        @unknown default:
+            completionHandler(.close)
+        }
+    }
+
+    // MARK: - Website Actions
+
+    override func handle(
+        action: ShieldAction,
+        for webDomain: WebDomain,
+        completionHandler: @escaping (ShieldActionResponse) -> Void
+    ) {
+        switch action {
+        case .primaryButtonPressed:
+            logWalkedAway(webToken: webDomain.token)
+            completionHandler(.close)
+
+        case .secondaryButtonPressed:
+            if let token = webDomain.token {
+                settingsStore.shield.webDomains?.remove(token)
+                createPendingReason(webToken: token)
+            }
+            completionHandler(.close)
+
+        @unknown default:
+            completionHandler(.close)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func logWalkedAway(appToken: ApplicationToken? = nil, webToken: WebDomainToken? = nil) {
+        let item: BlockedItem?
+        if let appToken {
+            item = store.blockedItems.first { $0.applicationToken == appToken }
+        } else if let webToken {
+            item = store.blockedItems.first { $0.webDomainToken == webToken }
+        } else {
+            item = nil
+        }
+
+        guard let item else { return }
+
+        let attempt = AccessAttempt(
+            blockedItemId: item.id,
+            blockedItemName: item.name,
+            whyNot: item.whyNot,
+            whyYes: "",
+            proceeded: false
+        )
+        store.logAttempt(attempt)
+    }
+
+    private func createPendingReason(appToken: ApplicationToken? = nil, webToken: WebDomainToken? = nil) {
+        let item: BlockedItem?
+        if let appToken {
+            item = store.blockedItems.first { $0.applicationToken == appToken }
+        } else if let webToken {
+            item = store.blockedItems.first { $0.webDomainToken == webToken }
+        } else {
+            item = nil
+        }
+
+        guard let item else { return }
+
+        let pending = PendingReason(
+            blockedItemId: item.id,
+            blockedItemName: item.name,
+            whyNot: item.whyNot
+        )
+        store.addPendingReason(pending)
+    }
+}
