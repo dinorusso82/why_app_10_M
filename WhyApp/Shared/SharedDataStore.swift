@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Shared storage accessible by the main app AND shield extensions via App Group.
 class SharedDataStore: ObservableObject {
