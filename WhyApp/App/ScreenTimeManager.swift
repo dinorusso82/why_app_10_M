@@ -5,13 +5,15 @@ import SwiftUI
 /// Handles Screen Time authorization and shield management.
 @MainActor
 class ScreenTimeManager: ObservableObject {
-    static let shared = ScreenTimeManager()
-
     @Published var isAuthorized = false
     @Published var authorizationError: String?
 
     private let store = ManagedSettingsStore()
-    private let dataStore = SharedDataStore()
+    private(set) var dataStore: SharedDataStore
+
+    init(dataStore: SharedDataStore) {
+        self.dataStore = dataStore
+    }
 
     // MARK: - Authorization
 

@@ -72,6 +72,16 @@ class SharedDataStore: ObservableObject {
         defaults.set(true, forKey: AppConstants.onboardingCompleteKey)
     }
 
+    // MARK: - Reload from Disk
+
+    /// Re-read all data from UserDefaults (picks up changes made by shield extensions).
+    func reload() {
+        blockedItems = Self.load(from: defaults, key: AppConstants.blockedItemsKey) ?? []
+        accessAttempts = Self.load(from: defaults, key: AppConstants.accessAttemptsKey) ?? []
+        pendingReasons = Self.load(from: defaults, key: AppConstants.pendingReasonsKey) ?? []
+        hasCompletedOnboarding = defaults.bool(forKey: AppConstants.onboardingCompleteKey)
+    }
+
     // MARK: - Persistence
 
     private func save<T: Codable>(_ value: T, key: String) {

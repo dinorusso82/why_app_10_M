@@ -53,10 +53,7 @@ struct ContentView: View {
     }
 
     private func reloadData() {
-        let fresh = SharedDataStore()
-        store.blockedItems = fresh.blockedItems
-        store.accessAttempts = fresh.accessAttempts
-        store.pendingReasons = fresh.pendingReasons
+        store.reload()
     }
 
     private func loadNextPending() {
