@@ -87,10 +87,18 @@ struct BlockedItemRow: View {
         }
         .contextMenu {
             Button(role: .destructive) {
-                onDelete?()
+                showingDelete = true
             } label: {
                 Label("Remove", systemImage: "trash")
             }
+        }
+        .alert("Remove \(item.name)?", isPresented: $showingDelete) {
+            Button("Cancel", role: .cancel) { }
+            Button("Remove", role: .destructive) {
+                onDelete?()
+            }
+        } message: {
+            Text("This will stop blocking \(item.name) and remove it from your list.")
         }
     }
 }

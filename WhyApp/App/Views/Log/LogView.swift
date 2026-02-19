@@ -90,9 +90,6 @@ struct LogEntryRow: View {
                             Text(attempt.timestamp, style: .relative)
                                 .font(.system(.caption2, design: .rounded))
                                 .foregroundStyle(Color.whyTertiary)
-                            + Text(" ago")
-                                .font(.system(.caption2, design: .rounded))
-                                .foregroundStyle(Color.whyTertiary)
                         }
                     }
 

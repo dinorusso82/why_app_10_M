@@ -87,19 +87,31 @@ struct PendingReasonView: View {
             Spacer()
 
             // Submit button
-            WhyButton(title: "Submit & Re-enable Shield", style: .primary) {
-                store.resolvePendingReason(
-                    pendingReason,
-                    whyYes: whyYes.trimmingCharacters(in: .whitespacesAndNewlines),
-                    proceeded: true
-                )
-                screenTime.applyShields()
-                onComplete()
+            VStack(spacing: 12) {
+                WhyButton(title: "Submit & Re-enable Shield", style: .primary) {
+                    store.resolvePendingReason(
+                        pendingReason,
+                        whyYes: whyYes.trimmingCharacters(in: .whitespacesAndNewlines),
+                        proceeded: true
+                    )
+                    screenTime.applyShields()
+                    onComplete()
+                }
+                .disabled(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .opacity(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0)
+                .animation(.easeOut(duration: 0.2), value: whyYes.isEmpty)
+
+                WhyButton(title: "Actually, I walked away", style: .secondary) {
+                    store.resolvePendingReason(
+                        pendingReason,
+                        whyYes: "",
+                        proceeded: false
+                    )
+                    screenTime.applyShields()
+                    onComplete()
+                }
             }
-            .disabled(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            .opacity(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0)
             .padding(.horizontal, 24)
-            .animation(.easeOut(duration: 0.2), value: whyYes.isEmpty)
 
             Spacer().frame(height: 40)
         }
