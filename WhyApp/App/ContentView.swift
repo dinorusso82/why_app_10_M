@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var store: SharedDataStore
     @EnvironmentObject var screenTime: ScreenTimeManager
+    @Environment(\.scenePhase) var scenePhase
 
     @State private var currentPending: PendingReason?
     @State private var selectedTab = 0
@@ -28,6 +29,15 @@ struct ContentView: View {
             reloadData()
             loadNextPending()
             styleTabBar()
+        }
+        .onChange(of: scenePhase) { phase in
+            guard phase == .active else { return }
+            // Re-apply shields every time WhyApp comes to the foreground.
+            // This is what re-locks a temporarily unshielded app after the
+            // user has finished their session and returns here.
+            reloadData()
+            loadNextPending()
+            screenTime.applyShields()
         }
     }
 
