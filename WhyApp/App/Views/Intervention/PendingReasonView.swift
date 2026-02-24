@@ -88,7 +88,7 @@ struct PendingReasonView: View {
 
             // Submit button
             VStack(spacing: 12) {
-                WhyButton(title: "Let me through", style: .primary) {
+                WhyButton(title: "Provide your why", style: .primary) {
                     let item = store.blockedItems.first { $0.id == pendingReason.blockedItemId }
                     store.resolvePendingReason(
                         pendingReason,
