@@ -23,6 +23,7 @@ struct OnboardingContainerView: View {
 struct OnboardingAddItemsView: View {
     @EnvironmentObject var store: SharedDataStore
     @State private var showingAddSheet = false
+    @State private var itemToDelete: BlockedItem?
     var onFinish: () -> Void
 
     var body: some View {
@@ -79,6 +80,15 @@ struct OnboardingAddItemsView: View {
                                     }
 
                                     Spacer()
+
+                                    Button {
+                                        itemToDelete = item
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundStyle(Color.whyTertiary)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -105,6 +115,18 @@ struct OnboardingAddItemsView: View {
         .whyBackground()
         .sheet(isPresented: $showingAddSheet) {
             AddBlockedItemView()
+        }
+        .alert(item: $itemToDelete) { item in
+            Alert(
+                title: Text("Remove \(item.name)?"),
+                message: Text("This will remove it from your list."),
+                primaryButton: .destructive(Text("Remove")) {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        store.removeBlockedItem(item)
+                    }
+                },
+                secondaryButton: .cancel()
+            )
         }
     }
 }

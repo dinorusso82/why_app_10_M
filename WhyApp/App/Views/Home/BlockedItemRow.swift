@@ -53,6 +53,16 @@ struct BlockedItemRow: View {
                                 .foregroundStyle(Color.whyTertiary)
                         }
                     }
+
+                    // Delete button
+                    Button {
+                        showingDelete = true
+                    } label: {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundStyle(Color.whyTertiary)
+                    }
+                    .buttonStyle(.plain)
                 }
 
                 // Stats bar (only if there have been attempts)
