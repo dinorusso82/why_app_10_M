@@ -4,12 +4,11 @@ import ManagedSettingsUI
 /// Handles button taps on the shield overlay.
 ///
 /// - Primary ("You're right — close it"): Dismisses the blocked app. Logged as "walked away".
-/// - Secondary ("I need to use it…"): Temporarily removes the shield and creates a
-///   pending reason the user must fill in next time they open WhyApp.
+/// - Secondary ("I need to use it…"): Creates a pending reason without lifting the shield.
+///   The user must open WhyApp, explain why, and tap "Let me through" to gain access.
 class WhyNotShieldAction: ShieldActionExtension {
 
     private let store = SharedDataStore()
-    private let settingsStore = ManagedSettingsStore()
 
     // MARK: - App Actions
 
@@ -25,9 +24,8 @@ class WhyNotShieldAction: ShieldActionExtension {
             completionHandler(.close)
 
         case .secondaryButtonPressed:
-            // "I need to use it…" — lift shield, record pending reason
+            // "I need to use it…" — record pending reason; shield stays until reason is given in WhyApp
             if let token = application.token {
-                settingsStore.shield.applications?.remove(token)
                 createPendingReason(appToken: token)
             }
             completionHandler(.close)
@@ -50,8 +48,8 @@ class WhyNotShieldAction: ShieldActionExtension {
             completionHandler(.close)
 
         case .secondaryButtonPressed:
+            // "I need to use it…" — record pending reason; shield stays until reason is given in WhyApp
             if let token = webDomain.token {
-                settingsStore.shield.webDomains?.remove(token)
                 createPendingReason(webToken: token)
             }
             completionHandler(.close)

@@ -32,13 +32,13 @@ struct PendingReasonView: View {
 
             // Context
             VStack(spacing: 16) {
-                Text("You used \(pendingReason.blockedItemName)")
+                Text("You're trying to open \(pendingReason.blockedItemName)")
                     .font(.system(.title2, design: .rounded, weight: .bold))
                     .foregroundStyle(Color.whyPrimary)
 
                 WhyCard {
                     VStack(spacing: 8) {
-                        Text("You said you wanted to avoid it because:")
+                        Text("You said you want to avoid it because:")
                             .font(.system(.caption, design: .rounded, weight: .medium))
                             .foregroundStyle(Color.whySecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -58,7 +58,7 @@ struct PendingReasonView: View {
 
             // Input
             VStack(alignment: .leading, spacing: 12) {
-                Text("Why did you decide to use it?")
+                Text("Why do you want to use it right now?")
                     .font(.system(.subheadline, design: .rounded, weight: .semibold))
                     .foregroundStyle(Color.whyPrimary)
                     .padding(.horizontal, 24)
@@ -88,20 +88,21 @@ struct PendingReasonView: View {
 
             // Submit button
             VStack(spacing: 12) {
-                WhyButton(title: "Submit & Re-enable Shield", style: .primary) {
+                WhyButton(title: "Let me through", style: .primary) {
+                    let item = store.blockedItems.first { $0.id == pendingReason.blockedItemId }
                     store.resolvePendingReason(
                         pendingReason,
                         whyYes: whyYes.trimmingCharacters(in: .whitespacesAndNewlines),
                         proceeded: true
                     )
-                    screenTime.applyShields()
+                    if let item { screenTime.unshield(item: item) }
                     onComplete()
                 }
                 .disabled(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .opacity(whyYes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0)
                 .animation(.easeOut(duration: 0.2), value: whyYes.isEmpty)
 
-                WhyButton(title: "Actually, I walked away", style: .secondary) {
+                WhyButton(title: "Never mind, I'll skip it", style: .secondary) {
                     store.resolvePendingReason(
                         pendingReason,
                         whyYes: "",
