@@ -85,13 +85,25 @@ class SharedDataStore: ObservableObject {
     // MARK: - Persistence
 
     private func save<T: Codable>(_ value: T, key: String) {
-        if let data = try? JSONEncoder().encode(value) {
+        do {
+            let data = try JSONEncoder().encode(value)
             defaults.set(data, forKey: key)
+        } catch {
+            // Crash in debug so the issue surfaces immediately during development.
+            // In release the save is skipped — the next successful save will recover.
+            assertionFailure("[SharedDataStore] Encode failed for '\(key)': \(error)")
         }
     }
 
     private static func load<T: Codable>(from defaults: UserDefaults, key: String) -> T? {
         guard let data = defaults.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(T.self, from: data)
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            // Data exists but couldn't be decoded — likely a schema mismatch or corruption.
+            // Crash in debug; fall back to nil (empty state) in release.
+            assertionFailure("[SharedDataStore] Decode failed for '\(key)': \(error)")
+            return nil
+        }
     }
 }

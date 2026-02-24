@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var store: SharedDataStore
     @EnvironmentObject var screenTime: ScreenTimeManager
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var currentPending: PendingReason?
     @State private var selectedTab = 0
@@ -26,9 +27,24 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.3), value: currentPending?.id)
         .onAppear {
             screenTime.reshieldExpiredItems()
+            screenTime.startReshieldTimer()
             reloadData()
             loadNextPending()
             styleTabBar()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .active:
+                // Pick up any changes made by shield extensions while in background.
+                reloadData()
+                screenTime.reshieldExpiredItems()
+                screenTime.startReshieldTimer()
+                loadNextPending()
+            case .background:
+                screenTime.stopReshieldTimer()
+            default:
+                break
+            }
         }
     }
 

@@ -10,9 +10,14 @@ class ScreenTimeManager: ObservableObject {
 
     private let store = ManagedSettingsStore()
     private(set) var dataStore: SharedDataStore
+    private var reshieldTask: Task<Void, Never>?
 
     init(dataStore: SharedDataStore) {
         self.dataStore = dataStore
+    }
+
+    deinit {
+        reshieldTask?.cancel()
     }
 
     // MARK: - Authorization
@@ -70,5 +75,25 @@ class ScreenTimeManager: ObservableObject {
         if !expired.isEmpty {
             applyShields()
         }
+    }
+
+    // MARK: - Reshield Timer
+
+    /// Start a background task that checks for expired temporary access every 60 seconds.
+    /// Call this when the app enters the foreground; stop it when backgrounded.
+    func startReshieldTimer() {
+        reshieldTask?.cancel()
+        reshieldTask = Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                guard !Task.isCancelled else { break }
+                reshieldExpiredItems()
+            }
+        }
+    }
+
+    func stopReshieldTimer() {
+        reshieldTask?.cancel()
+        reshieldTask = nil
     }
 }
