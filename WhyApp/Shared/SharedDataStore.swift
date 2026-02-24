@@ -60,11 +60,6 @@ class SharedDataStore: ObservableObject {
         save(pendingReasons, key: AppConstants.pendingReasonsKey)
     }
 
-    func expiredPendingReasons() -> [PendingReason] {
-        let cutoff = Date().addingTimeInterval(-AppConstants.unshieldDurationSeconds)
-        return pendingReasons.filter { $0.unshieldedAt < cutoff }
-    }
-
     // MARK: - Onboarding
 
     func completeOnboarding() {

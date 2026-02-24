@@ -60,15 +60,4 @@ class ScreenTimeManager: ObservableObject {
         }
     }
 
-    /// Re-shield any items whose temporary access has expired,
-    /// and mark their pending reasons as auto-resolved.
-    func reshieldExpiredItems() {
-        let expired = dataStore.expiredPendingReasons()
-        for reason in expired {
-            dataStore.resolvePendingReason(reason, whyYes: "(no reason provided — access expired)", proceeded: true)
-        }
-        if !expired.isEmpty {
-            applyShields()
-        }
-    }
 }
