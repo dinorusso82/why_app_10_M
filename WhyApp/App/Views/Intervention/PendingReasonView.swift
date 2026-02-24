@@ -32,9 +32,16 @@ struct PendingReasonView: View {
 
             // Context
             VStack(spacing: 16) {
-                Text("You used \(pendingReason.blockedItemName)")
-                    .font(.system(.title2, design: .rounded, weight: .bold))
-                    .foregroundStyle(Color.whyPrimary)
+                VStack(spacing: 4) {
+                    if !store.userName.isEmpty {
+                        Text("Hey \(store.userName),")
+                            .font(.system(.subheadline, design: .rounded, weight: .medium))
+                            .foregroundStyle(Color.whySecondary)
+                    }
+                    Text("You used \(pendingReason.blockedItemName)")
+                        .font(.system(.title2, design: .rounded, weight: .bold))
+                        .foregroundStyle(Color.whyPrimary)
+                }
 
                 WhyCard {
                     VStack(spacing: 8) {

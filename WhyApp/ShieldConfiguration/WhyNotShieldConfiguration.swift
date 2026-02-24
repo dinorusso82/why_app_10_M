@@ -43,13 +43,17 @@ class WhyNotShieldConfiguration: ShieldConfigurationExtension {
     // MARK: - Shared Config
 
     private func makeConfig(name: String, whyNot: String, verb: String) -> ShieldConfiguration {
-        ShieldConfiguration(
+        let userName = store.userName
+        let titleText = userName.isEmpty
+            ? "You don't want to \(verb) \(name)"
+            : "\(userName), you don't want to \(verb) \(name)"
+        return ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterial,
             backgroundColor: warmBg,
             icon: UIImage(systemName: "hand.raised.fill")?
                 .withTintColor(warmAccent, renderingMode: .alwaysOriginal),
             title: ShieldConfiguration.Label(
-                text: "You don't want to \(verb) \(name)",
+                text: titleText,
                 color: warmDark
             ),
             subtitle: ShieldConfiguration.Label(

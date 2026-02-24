@@ -45,21 +45,42 @@ struct OnboardingWelcomeView: View {
 
             // Bottom section
             VStack(spacing: 20) {
-                WhyCard {
-                    HStack(spacing: 14) {
-                        Image(systemName: "lock.shield")
-                            .font(.title2)
-                            .foregroundStyle(Color.whySage)
-                            .frame(width: 36)
+                VStack(spacing: 10) {
+                    WhyCard {
+                        HStack(spacing: 14) {
+                            Image(systemName: "lock.shield")
+                                .font(.title2)
+                                .foregroundStyle(Color.whySage)
+                                .frame(width: 36)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Screen Time Permission")
-                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                .foregroundStyle(Color.whyPrimary)
-                            Text("We need this to show you a reminder when you try to open blocked apps. Nothing leaves your phone.")
-                                .font(.system(.caption, design: .rounded))
-                                .foregroundStyle(Color.whySecondary)
-                                .lineSpacing(2)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Screen Time Permission")
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Color.whyPrimary)
+                                Text("We need this to block apps and websites when you're tempted.")
+                                    .font(.system(.caption, design: .rounded))
+                                    .foregroundStyle(Color.whySecondary)
+                                    .lineSpacing(2)
+                            }
+                        }
+                    }
+
+                    WhyCard {
+                        HStack(spacing: 14) {
+                            Image(systemName: "iphone.and.arrow.forward")
+                                .font(.title2)
+                                .foregroundStyle(Color.whySage)
+                                .frame(width: 36)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("100% On-Device")
+                                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(Color.whyPrimary)
+                                Text("Everything lives on your phone. No accounts, no cloud, no data ever leaves your device.")
+                                    .font(.system(.caption, design: .rounded))
+                                    .foregroundStyle(Color.whySecondary)
+                                    .lineSpacing(2)
+                            }
                         }
                     }
                 }
@@ -70,7 +91,7 @@ struct OnboardingWelcomeView: View {
                         await screenTime.requestAuthorization()
                         if screenTime.isAuthorized {
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                currentStep = .addItems
+                                currentStep = .name
                             }
                         }
                     }
@@ -97,5 +118,6 @@ struct OnboardingWelcomeView: View {
 
 enum OnboardingStep {
     case welcome
+    case name
     case addItems
 }

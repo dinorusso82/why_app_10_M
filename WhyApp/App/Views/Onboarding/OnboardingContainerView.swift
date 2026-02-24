@@ -10,6 +10,9 @@ struct OnboardingContainerView: View {
         case .welcome:
             OnboardingWelcomeView(currentStep: $currentStep)
 
+        case .name:
+            OnboardingNameView(currentStep: $currentStep)
+
         case .addItems:
             OnboardingAddItemsView(onFinish: {
                 withAnimation(.easeInOut(duration: 0.4)) {
@@ -17,6 +20,78 @@ struct OnboardingContainerView: View {
                 }
             })
         }
+    }
+}
+
+struct OnboardingNameView: View {
+    @EnvironmentObject var store: SharedDataStore
+    @Binding var currentStep: OnboardingStep
+
+    @State private var name = ""
+    @State private var animate = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            ZStack {
+                Circle()
+                    .fill(Color.whySurface)
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(animate ? 1.0 : 0.8)
+
+                Image(systemName: "person.fill")
+                    .font(.system(size: 52))
+                    .foregroundStyle(Color.whyWarm)
+                    .scaleEffect(animate ? 1.0 : 0.6)
+            }
+            .animation(.spring(response: 0.8, dampingFraction: 0.6), value: animate)
+
+            Spacer().frame(height: 40)
+
+            VStack(spacing: 14) {
+                Text("What should we call you?")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.whyPrimary)
+
+                Text("Just your first name. It stays on your device.")
+                    .font(.system(.body, design: .rounded))
+                    .foregroundStyle(Color.whySecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .opacity(animate ? 1 : 0)
+            .offset(y: animate ? 0 : 20)
+            .animation(.easeOut(duration: 0.7).delay(0.2), value: animate)
+
+            Spacer().frame(height: 40)
+
+            TextField("Your first name", text: $name)
+                .font(.system(.title3, design: .rounded))
+                .multilineTextAlignment(.center)
+                .padding(16)
+                .background(Color.whyCardBg)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .shadow(color: .black.opacity(0.04), radius: 12, x: 0, y: 4)
+                .padding(.horizontal, 24)
+                .opacity(animate ? 1 : 0)
+                .animation(.easeOut(duration: 0.7).delay(0.35), value: animate)
+
+            Spacer()
+
+            WhyButton(title: "Continue", style: .primary) {
+                store.saveUserName(name.trimmingCharacters(in: .whitespaces))
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    currentStep = .addItems
+                }
+            }
+            .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+            .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1.0)
+            .animation(.easeOut(duration: 0.2), value: name.isEmpty)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40)
+        }
+        .whyBackground()
+        .onAppear { animate = true }
     }
 }
 

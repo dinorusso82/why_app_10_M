@@ -9,10 +9,12 @@ class SharedDataStore: ObservableObject {
     @Published var accessAttempts: [AccessAttempt] = []
     @Published var pendingReasons: [PendingReason] = []
     @Published var hasCompletedOnboarding: Bool
+    @Published var userName: String
 
     init() {
         self.defaults = UserDefaults(suiteName: AppConstants.appGroupID) ?? .standard
         self.hasCompletedOnboarding = defaults.bool(forKey: AppConstants.onboardingCompleteKey)
+        self.userName = defaults.string(forKey: AppConstants.userNameKey) ?? ""
         self.blockedItems = Self.load(from: defaults, key: AppConstants.blockedItemsKey) ?? []
         self.accessAttempts = Self.load(from: defaults, key: AppConstants.accessAttemptsKey) ?? []
         self.pendingReasons = Self.load(from: defaults, key: AppConstants.pendingReasonsKey) ?? []
@@ -60,6 +62,13 @@ class SharedDataStore: ObservableObject {
         save(pendingReasons, key: AppConstants.pendingReasonsKey)
     }
 
+    // MARK: - User Name
+
+    func saveUserName(_ name: String) {
+        userName = name
+        defaults.set(name, forKey: AppConstants.userNameKey)
+    }
+
     // MARK: - Onboarding
 
     func completeOnboarding() {
@@ -75,6 +84,7 @@ class SharedDataStore: ObservableObject {
         accessAttempts = Self.load(from: defaults, key: AppConstants.accessAttemptsKey) ?? []
         pendingReasons = Self.load(from: defaults, key: AppConstants.pendingReasonsKey) ?? []
         hasCompletedOnboarding = defaults.bool(forKey: AppConstants.onboardingCompleteKey)
+        userName = defaults.string(forKey: AppConstants.userNameKey) ?? ""
     }
 
     // MARK: - Persistence

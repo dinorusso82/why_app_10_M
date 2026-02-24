@@ -9,4 +9,5 @@ enum AppConstants {
     static let accessAttemptsKey = "access_attempts"
     static let pendingReasonsKey = "pending_reasons"
     static let onboardingCompleteKey = "onboarding_complete"
+    static let userNameKey = "user_name"
 }
