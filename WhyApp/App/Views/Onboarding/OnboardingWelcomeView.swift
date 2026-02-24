@@ -31,7 +31,7 @@ struct OnboardingWelcomeView: View {
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.whyPrimary)
 
-                Text("A gentle nudge before you reach\nfor that app you're trying to avoid.")
+                Text("A gentle nudge before you reach\nfor that app or website you're trying to avoid.")
                     .font(.system(.body, design: .rounded))
                     .foregroundStyle(Color.whySecondary)
                     .multilineTextAlignment(.center)
