@@ -25,7 +25,6 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.4), value: store.hasCompletedOnboarding)
         .animation(.easeInOut(duration: 0.3), value: currentPending?.id)
         .onAppear {
-            screenTime.reshieldExpiredItems()
             reloadData()
             loadNextPending()
             styleTabBar()
