@@ -94,3 +94,21 @@ targets:
         NSExtension:
           NSExtensionPointIdentifier: com.apple.screentime.shield.action
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).WhyNotShieldAction
+
+schemes:
+  WhyApp:
+    build:
+      targets:
+        WhyApp: all
+        ShieldConfiguration: all
+        ShieldAction: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
