@@ -57,6 +57,13 @@ struct ContentView: View {
                     Image(systemName: "book.fill")
                     Text("Log")
                 }
+
+            StatsView()
+                .tag(2)
+                .tabItem {
+                    Image(systemName: "chart.bar.fill")
+                    Text("Stats")
+                }
         }
         .tint(Color.whyWarm)
     }
