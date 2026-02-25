@@ -6,6 +6,9 @@ import ManagedSettingsUI
 /// - Primary ("You're right — close it"): Dismisses the blocked app. Logged as "walked away".
 /// - Secondary ("I need to use it…"): Creates a pending reason without lifting the shield.
 ///   The user must open WhyApp, explain why, and tap "Let me through" to gain access.
+///
+/// Note: ShieldActionExtension is unavailable in the iOS Simulator — guarded accordingly.
+#if !targetEnvironment(simulator)
 class WhyNotShieldAction: ShieldActionExtension {
 
     private let store = SharedDataStore()
@@ -103,3 +106,4 @@ class WhyNotShieldAction: ShieldActionExtension {
         store.addPendingReason(pending)
     }
 }
+#endif

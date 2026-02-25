@@ -7,7 +7,8 @@ import UIKit
 /// This runs as a separate extension process. It reads the shared data store
 /// to find the user's "why not" reason and displays it on the shield.
 ///
-/// Note: ShieldConfiguration uses UIKit colors since it runs outside the SwiftUI context.
+/// Note: ShieldConfigurationExtension is unavailable in the iOS Simulator — guarded accordingly.
+#if !targetEnvironment(simulator)
 class WhyNotShieldConfiguration: ShieldConfigurationExtension {
 
     private let store = SharedDataStore()
@@ -92,3 +93,4 @@ class WhyNotShieldConfiguration: ShieldConfigurationExtension {
         )
     }
 }
+#endif
