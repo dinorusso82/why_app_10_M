@@ -60,6 +60,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldConfiguration
         CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - sdk: ManagedSettings.framework
+      - sdk: ManagedSettingsUI.framework
     entitlements:
       path: WhyApp/ShieldConfiguration/ShieldConfiguration.entitlements
     info:
@@ -80,6 +83,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldAction
         CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - sdk: ManagedSettings.framework
+      - sdk: ManagedSettingsUI.framework
     entitlements:
       path: WhyApp/ShieldAction/ShieldAction.entitlements
     info:
@@ -88,3 +94,22 @@ targets:
         NSExtension:
           NSExtensionPointIdentifier: com.apple.screentime.shield.action
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).WhyNotShieldAction
+
+schemes:
+  WhyApp:
+    build:
+      targets:
+        WhyApp: all
+        ShieldConfiguration: all
+        ShieldAction: all
+    run:
+      config: Debug
+      executable: WhyApp
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
