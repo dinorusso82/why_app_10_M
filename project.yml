@@ -104,6 +104,7 @@ schemes:
         ShieldAction: all
     run:
       config: Debug
+      executable: WhyApp
     test:
       config: Debug
     profile:
