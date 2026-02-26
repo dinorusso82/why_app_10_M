@@ -60,10 +60,12 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldConfiguration
         CODE_SIGN_STYLE: Automatic
+        OTHER_SWIFT_FLAGS: "$(inherited) -F $(SDKROOT)/System/Library/Frameworks"
+        OTHER_LDFLAGS: "$(inherited) -framework FamilyControls -framework ManagedSettings -framework ManagedSettingsUI"
     dependencies:
-      - sdk: FamilyControls.framework
-      - sdk: ManagedSettings.framework
-      - sdk: ManagedSettingsUI.framework
+      - sdk: System/Library/Frameworks/FamilyControls.framework
+      - sdk: System/Library/Frameworks/ManagedSettings.framework
+      - sdk: System/Library/Frameworks/ManagedSettingsUI.framework
     entitlements:
       path: WhyApp/ShieldConfiguration/ShieldConfiguration.entitlements
     info:
@@ -84,10 +86,12 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldAction
         CODE_SIGN_STYLE: Automatic
+        OTHER_SWIFT_FLAGS: "$(inherited) -F $(SDKROOT)/System/Library/Frameworks"
+        OTHER_LDFLAGS: "$(inherited) -framework FamilyControls -framework ManagedSettings -framework ManagedSettingsUI"
     dependencies:
-      - sdk: FamilyControls.framework
-      - sdk: ManagedSettings.framework
-      - sdk: ManagedSettingsUI.framework
+      - sdk: System/Library/Frameworks/FamilyControls.framework
+      - sdk: System/Library/Frameworks/ManagedSettings.framework
+      - sdk: System/Library/Frameworks/ManagedSettingsUI.framework
     entitlements:
       path: WhyApp/ShieldAction/ShieldAction.entitlements
     info:
