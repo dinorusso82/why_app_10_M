@@ -61,6 +61,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldConfiguration
         CODE_SIGN_STYLE: Automatic
     dependencies:
+      - sdk: FamilyControls.framework
       - sdk: ManagedSettings.framework
       - sdk: ManagedSettingsUI.framework
     entitlements:
@@ -84,6 +85,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldAction
         CODE_SIGN_STYLE: Automatic
     dependencies:
+      - sdk: FamilyControls.framework
       - sdk: ManagedSettings.framework
       - sdk: ManagedSettingsUI.framework
     entitlements:
