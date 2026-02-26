@@ -35,9 +35,9 @@ targets:
     entitlements:
       path: WhyApp/WhyApp.entitlements
     dependencies:
-      - target: ShieldConfiguration
+      - target: WhyNotShieldConfiguration
         embed: true
-      - target: ShieldAction
+      - target: WhyNotShieldAction
         embed: true
     info:
       path: WhyApp/App/Info.plist
@@ -49,7 +49,7 @@ targets:
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
 
-  ShieldConfiguration:
+  WhyNotShieldConfiguration:
     type: app-extension
     platform: iOS
     deploymentTarget: "17.0"
@@ -72,7 +72,7 @@ targets:
           NSExtensionPointIdentifier: com.apple.screentime.shield.configuration
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).WhyNotShieldConfiguration
 
-  ShieldAction:
+  WhyNotShieldAction:
     type: app-extension
     platform: iOS
     deploymentTarget: "17.0"
@@ -100,8 +100,8 @@ schemes:
     build:
       targets:
         WhyApp: all
-        ShieldConfiguration: all
-        ShieldAction: all
+        WhyNotShieldConfiguration: all
+        WhyNotShieldAction: all
     run:
       config: Debug
       executable: WhyApp
