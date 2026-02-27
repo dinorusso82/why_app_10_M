@@ -60,6 +60,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldConfiguration
         CODE_SIGN_STYLE: Automatic
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SDKROOT)/System/Library/Frameworks $(PLATFORM_DIR)/Developer/Library/Frameworks"
+        OTHER_LDFLAGS: "$(inherited) -framework ManagedSettings -framework ManagedSettingsUI"
     dependencies:
       - sdk: ManagedSettings.framework
       - sdk: ManagedSettingsUI.framework
@@ -83,6 +85,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.whynot.WhyApp.ShieldAction
         CODE_SIGN_STYLE: Automatic
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SDKROOT)/System/Library/Frameworks $(PLATFORM_DIR)/Developer/Library/Frameworks"
+        OTHER_LDFLAGS: "$(inherited) -framework ManagedSettings -framework ManagedSettingsUI"
     dependencies:
       - sdk: ManagedSettings.framework
       - sdk: ManagedSettingsUI.framework
